@@ -1,4 +1,5 @@
 using BookingCinema525.Repositories;
+using BookingCinema525_new.Models;
 using Ecommerce525.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -33,6 +34,7 @@ namespace BookingCinema525
             .AddDefaultTokenProviders();
             builder.Services.AddScoped<IRepository<Movie>, Repository<Movie>>();
             builder.Services.AddScoped < IRepository <Category>, Repository<Category>>();
+            builder.Services.AddScoped<IRepository<ApplicationUserOTP>, Repository<ApplicationUserOTP>>();
             builder.Services.AddScoped<IRepository<Cinema>, Repository<Cinema>>();
             builder.Services.AddScoped<IRepository<Actor>, Repository<Actor>>();
             builder.Services.AddScoped<IMovieSubImageRepository, MovieSubImageRepository >();
@@ -64,10 +66,6 @@ namespace BookingCinema525
             //pattern: "{area=Main}/{controller=Home}/{action=Index}/{id?}")
             //pattern: "{area=Admin}/{controller=Movie}/{action=Index}/{id?}")
             .WithStaticAssets();
-
-
-
-
             app.Run();
         }
     }

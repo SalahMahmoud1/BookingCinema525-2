@@ -1,4 +1,6 @@
-﻿using BookingCinema525_new.ViewModels;
+﻿using BookingCinema525.Repositories;
+using BookingCinema525_new.Models;
+using BookingCinema525_new.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +15,13 @@ namespace BookingCinema525_new.Areas.Identity.Controllers
         UserManager<ApplicationUser> _userManager;
         SignInManager<ApplicationUser> _signInManager;
         IEmailSender _emailSender;
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender)
+        IRepository<ApplicationUserOTP> _applicationUserOTP;
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, IRepository<ApplicationUserOTP> applicationUserOTP)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _applicationUserOTP = applicationUserOTP;
         }
 
         [HttpGet]
@@ -131,6 +135,102 @@ namespace BookingCinema525_new.Areas.Identity.Controllers
             TempData["Success-Notification"] = "Login Successfully";
             return RedirectToAction("Index", "HomeMovie", new { area = "Main" });
         }
-      
+        [HttpGet]
+        public IActionResult ForgetPassword()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ForgetPassword(ForgetPasswordVM forgetPasswordVM)
+        {
+            var user = await _userManager.FindByEmailAsync(forgetPasswordVM.UserNameOrEmail) ??
+                       await _userManager.FindByNameAsync(forgetPasswordVM.UserNameOrEmail);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("", "invalid UserName Or Email Or Password");
+                return View(forgetPasswordVM);
+            }
+            var otp = new Random().Next(1000, 9999).ToString();
+            var applicationUserOtp = new ApplicationUserOTP(otp, user.Id);
+            await _applicationUserOTP.CreateAsync(applicationUserOtp);
+            await _applicationUserOTP.CommitAsync();
+            await _emailSender.SendEmailAsync(
+                user.Email,
+                "Rest Your Password",
+                $"<h1> Use This <span style = \"color:red\" > {otp} </span> to rest your password </h1>"
+                );
+
+            return RedirectToAction(nameof(VerifyOTP), new { userId = user.Id });
+        }
+        [HttpGet]
+        public IActionResult VerifyOTP(string userId)
+        {
+            return View(new VerifyOTPVM() { UserId = userId });
+        }
+        [HttpPost]
+        public async Task<IActionResult> VerifyOTP(VerifyOTPVM verifyOTPVM)
+        {
+            var user = await _userManager.FindByIdAsync(verifyOTPVM.UserId);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "invalid UserName Or Email Or Password");
+                return View(verifyOTPVM);
+            }
+
+            var otps = await _applicationUserOTP.GetAsync(e =>
+                e.ApplicationUserId == user.Id &&
+                e.IsValid == true &&
+                DateTime.UtcNow < e.ValidTo &&
+                e.OTP == verifyOTPVM.OTP
+                );
+            var otp =otps.OrderByDescending (e => e.CreatedAt).FirstOrDefault();
+            if (otp == null || otp.OTP!=verifyOTPVM.OTP)
+            {
+                ModelState.AddModelError("", "Invalid / Expired OTP ");
+                return View(verifyOTPVM);
+            }
+            otp.IsValid = false;
+            await _applicationUserOTP.CommitAsync();
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            TempData["token"] = token;
+            return RedirectToAction(nameof(ResetPassword), new { userId = user.Id });
+        }
+        [HttpGet]
+        public IActionResult ResetPassword(string userId)
+        {
+            var token = TempData["token"] as string;
+            if (token is null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+            return View(new ResetPasswordVM() { UserId = userId, Token = token });
+        }
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordVM resetPasswordVM)
+        {
+
+            if (resetPasswordVM.Token is null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+            var user = await _userManager.FindByIdAsync(resetPasswordVM.UserId);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "invalid User ");
+                return View(resetPasswordVM);
+            }
+            var result = await _userManager.ResetPasswordAsync(user, resetPasswordVM.Token, resetPasswordVM.Password);
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View(resetPasswordVM);
+            }
+            return RedirectToAction(nameof(Login));
+        }
+
     }
 }

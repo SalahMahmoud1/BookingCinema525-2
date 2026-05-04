@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using BookingCinema525_new.ViewModels;
+using BookingCinema525_new.Models;
 
 namespace BookingCinema525.DataAccess
 {
@@ -16,8 +17,11 @@ namespace BookingCinema525.DataAccess
         public DbSet<Movie> Movies { get; set; }
         public DbSet<MovieSubImage> MovieSubImages{ get; set; }
         public DbSet<ActorMovieList> ActorMovieLists {  get; set; }
-        public DbSet<BookingCinema525_new.ViewModels.LoginVM> LoginVM { get; set; } = default!;
-        public DbSet<BookingCinema525_new.ViewModels.ResendEmailConfirmationVM> ResendEmailConfirmationVM { get; set; } = default!;
+        public DbSet<ApplicationUserOTP> ApplicationUserOTPs { get; set; }
+        public DbSet<BookingCinema525_new.ViewModels.VerifyOTPVM> VerifyOTPVM { get; set; } = default!;
+        public DbSet<BookingCinema525_new.ViewModels.ResetPasswordVM> ResetPasswordVM { get; set; } = default!;
+
+
         //public DbSet<BookingCinema525_new.ViewModels.RegisterVM> RegisterVM { get; set; } = default!;
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
