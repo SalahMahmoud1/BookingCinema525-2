@@ -1,9 +1,12 @@
 ﻿using BookingCinema525.Repositories;
+using BookingCinema525_new.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookingCinema525.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize()]
     public class CategoryController : Controller
     {
         //ApplicationDbContext _context = new ApplicationDbContext();
@@ -39,6 +42,8 @@ namespace BookingCinema525.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = $"{CD.SUPER_ADMIN_ROLE},{CD.ADMIN_ROLE}")]
+        [HttpGet]
         public async Task<IActionResult> Update(int id)
         {
             //var category = _context.Categories.FirstOrDefault(c => c.Id == id);
@@ -51,6 +56,7 @@ namespace BookingCinema525.Areas.Admin.Controllers
            
         }
         [HttpPost]
+        [Authorize(Roles = $"{CD.SUPER_ADMIN_ROLE},{CD.ADMIN_ROLE}")]
         public async Task<IActionResult> Update(Category category)
         {
             //_context.Categories.Update(category);
@@ -59,6 +65,7 @@ namespace BookingCinema525.Areas.Admin.Controllers
             await _categoryRepository.CommitAsync();
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = $"{CD.SUPER_ADMIN_ROLE},{CD.ADMIN_ROLE}")]
         public async Task<IActionResult> Delete(int id)
         {
             //var category = _context.Categories.FirstOrDefault(c => c.Id == id);

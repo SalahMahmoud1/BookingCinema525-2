@@ -1,5 +1,6 @@
 using BookingCinema525.Repositories;
 using BookingCinema525_new.Models;
+using BookingCinema525_new.Utilities.DBSeeding;
 using Ecommerce525.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -11,7 +12,7 @@ namespace BookingCinema525
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -40,8 +41,21 @@ namespace BookingCinema525
             builder.Services.AddScoped<IMovieSubImageRepository, MovieSubImageRepository >();
             builder.Services.AddScoped<IActorMovieListRepository, ActorMovieListRepository>();
             builder.Services.AddTransient<IEmailSender, EmailSender>();
+            builder.Services.AddTransient<IDbInitializer, DbInitializer>();
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                // Path where users are redirected if they aren't logged in
+                options.LoginPath = "/Identity/Account/Login";
 
-            var app = builder.Build();
+                // Path where users are redirected if they lack permissions
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            }); 
+                        var app = builder.Build();
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+                await dbInitializer.InitializeAsync();
+            }
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

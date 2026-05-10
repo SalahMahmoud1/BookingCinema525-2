@@ -1,11 +1,13 @@
 ﻿using BookingCinema525.Repositories;
 using BookingCinema525_new.Models;
+using BookingCinema525_new.Utilities;
 using BookingCinema525_new.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using NuGet.Versioning;
 
 namespace BookingCinema525_new.Areas.Identity.Controllers
 {
@@ -53,6 +55,7 @@ namespace BookingCinema525_new.Areas.Identity.Controllers
                 ModelState.AddModelError(string.Empty, errors);
                 return View(registerVM);
             }
+            await _userManager.AddToRoleAsync(user, CD.CUSTOMER_ROLE);
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var link = Url.Action(nameof(ConfirmEmail), "Account", new { area = "Identity", userId = user.Id , token }, Request.Scheme);
             await _emailSender.SendEmailAsync(
@@ -230,6 +233,15 @@ namespace BookingCinema525_new.Areas.Identity.Controllers
                 return View(resetPasswordVM);
             }
             return RedirectToAction(nameof(Login));
+        }
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+        public async Task Logout()
+        {
+            await _signInManager.SignOutAsync();
+            RedirectToAction("Index", "HomeMovie", new {area ="Main"});
         }
 
     }

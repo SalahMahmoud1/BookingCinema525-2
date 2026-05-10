@@ -1,4 +1,6 @@
 ﻿using BookingCinema525.Repositories;
+using BookingCinema525_new.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
@@ -6,6 +8,7 @@ using static System.Net.WebRequestMethods;
 namespace BookingCinema525.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize()]
     public class MovieController : Controller
     {
         //ApplicationDbContext _context = new ApplicationDbContext();
@@ -143,6 +146,7 @@ namespace BookingCinema525.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = $"{CD.SUPER_ADMIN_ROLE},{CD.ADMIN_ROLE}")]
         public async Task<IActionResult> Update(int id)
         {
 
@@ -167,6 +171,7 @@ namespace BookingCinema525.Areas.Admin.Controllers
             });
         }
         [HttpPost]
+        [Authorize(Roles = $"{CD.SUPER_ADMIN_ROLE},{CD.ADMIN_ROLE}")]
         public async Task<IActionResult> Update(Movie movie, IFormFile ImgFile, List<IFormFile> SubImgFiles, List<int> ActorList)
         {
             //var movieInDb = _context.Movies.AsNoTracking().FirstOrDefault(m => m.Id == movie.Id);
@@ -262,6 +267,7 @@ namespace BookingCinema525.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = $"{CD.SUPER_ADMIN_ROLE},{CD.ADMIN_ROLE}")]
         public async Task<IActionResult> Delete(int id)
         {
             //var movie = _context.Movies.FirstOrDefault(c => c.Id == id);

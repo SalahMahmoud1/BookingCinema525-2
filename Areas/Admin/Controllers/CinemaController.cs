@@ -1,8 +1,11 @@
 ﻿using BookingCinema525.Repositories;
+using BookingCinema525_new.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 namespace BookingCinema525.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize()]
     public class CinemaController : Controller
     {
         //ApplicationDbContext _context = new ApplicationDbContext();
@@ -43,6 +46,7 @@ namespace BookingCinema525.Areas.Admin.Controllers
             await _cinemaRepository.CommitAsync();
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = $"{CD.SUPER_ADMIN_ROLE},{CD.ADMIN_ROLE}")]
         public async Task<IActionResult> Update(int id)
         {
             //var cinema = _context.Cinemas.FirstOrDefault(c => c.Id == id);
@@ -55,6 +59,7 @@ namespace BookingCinema525.Areas.Admin.Controllers
            
         }
         [HttpPost]
+        [Authorize(Roles = $"{CD.SUPER_ADMIN_ROLE},{CD.ADMIN_ROLE}")]
         public async Task<IActionResult> Update(Cinema cinema, IFormFile ImgFile)
         {
             //var cinemaInDb = _context.Cinemas.AsNoTracking().FirstOrDefault(b => b.Id == cinema.Id);
@@ -86,6 +91,7 @@ namespace BookingCinema525.Areas.Admin.Controllers
             await _cinemaRepository.CommitAsync();
             return RedirectToAction(nameof(Index));
         }
+        [Authorize(Roles = $"{CD.SUPER_ADMIN_ROLE},{CD.ADMIN_ROLE}")]
         public async Task<IActionResult> Delete(int id)
         {
             //var cinema = _context.Cinemas.FirstOrDefault(b => b.Id == id);
