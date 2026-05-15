@@ -6,3 +6,4 @@ global using BookingCinema525.ViewModels;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using BookingCinema525_new.Utilities;
 global using BookingCinema525_new.ViewModels;
+global using BookingCinema525_new.Models;

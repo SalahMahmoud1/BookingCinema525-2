@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>a3a507a0-8a4b-4a5c-9fe3-72857e43f962</UserSecretsId>
   </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Mapster" Version="10.0.7" />
@@ -17,6 +18,7 @@
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
 		<PackageReference Include="NuGet.Packaging" Version="7.3.1" />
 		<PackageReference Include="NuGet.Protocol" Version="7.3.1" />
+		<PackageReference Include="Stripe.net" Version="51.1.0" />
 	</ItemGroup>
   <ItemGroup>
     <Folder Include="wwwroot\Images\MovieImages\MovieSubImages\" />

@@ -20,6 +20,9 @@ namespace BookingCinema525.DataAccess
         public DbSet<ApplicationUserOTP> ApplicationUserOTPs { get; set; }
         public DbSet<BookingCinema525_new.ViewModels.VerifyOTPVM> VerifyOTPVM { get; set; } = default!;
         public DbSet<BookingCinema525_new.ViewModels.ResetPasswordVM> ResetPasswordVM { get; set; } = default!;
+        public DbSet<Cart> Carts { get; set; }
+        public DbSet<Promotion> Promotions { get; set; }
+        public DbSet<UserPromotion> UserPromotions { get; set; }
 
 
         //public DbSet<BookingCinema525_new.ViewModels.RegisterVM> RegisterVM { get; set; } = default!;

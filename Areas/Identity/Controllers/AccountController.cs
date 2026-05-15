@@ -238,11 +238,10 @@ namespace BookingCinema525_new.Areas.Identity.Controllers
         {
             return View();
         }
-        public async Task Logout()
+        public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            RedirectToAction("Index", "HomeMovie", new {area ="Main"});
+            return RedirectToAction(nameof(Login));
         }
-
     }
 }

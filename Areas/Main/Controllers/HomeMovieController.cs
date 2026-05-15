@@ -1,4 +1,5 @@
 ﻿using BookingCinema525.DataAccess;
+using BookingCinema525.Repositories;
 using BookingCinema525.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,10 +10,11 @@ namespace BookingCinema525.Areas.Main.Controllers
     public class HomeMovieController : Controller
     {
         ApplicationDbContext _context; //= new ApplicationDbContext();
-
-        public HomeMovieController(ApplicationDbContext context )
+        private readonly IRepository<Movie> _movieRepository;
+        public HomeMovieController(ApplicationDbContext context, IRepository<Movie> movieRepository)
         {
             _context = context;
+            _movieRepository = movieRepository;
         }
 
         public IActionResult Index(FilterMovieVm filter)
@@ -51,6 +53,19 @@ namespace BookingCinema525.Areas.Main.Controllers
             ViewBag.CurrentPage = filter.Page;
             movies = movies.Skip((filter.Page - 1) * 8).Take(8);
             return View(movies.ToList());
+        }
+        public async Task<IActionResult> MovieDetails(int id)
+        {
+            var movie = await _movieRepository.GetOneAsync(m => m.Id == id, includes: [m=>m.Category]);
+            if (movie == null) return NotFound();
+            var relatedMovies =await _movieRepository.GetAsync(m => m.CategoryId == movie.CategoryId && m.Id != movie.Id, includes: [m => m.Category]);
+            relatedMovies = relatedMovies.Skip(0).Take(4);
+            return View(new MovieWithRelatedVM
+            {
+                 Movie = movie,
+                 RelatedMovies = relatedMovies
+            });
+
         }
     }
 }

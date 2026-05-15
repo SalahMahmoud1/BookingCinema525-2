@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Stripe;
 
 namespace BookingCinema525
 {
@@ -37,7 +38,10 @@ namespace BookingCinema525
             builder.Services.AddScoped < IRepository <Category>, Repository<Category>>();
             builder.Services.AddScoped<IRepository<ApplicationUserOTP>, Repository<ApplicationUserOTP>>();
             builder.Services.AddScoped<IRepository<Cinema>, Repository<Cinema>>();
+            builder.Services.AddScoped<IRepository<UserPromotion>, Repository<UserPromotion>>();
             builder.Services.AddScoped<IRepository<Actor>, Repository<Actor>>();
+            builder.Services.AddScoped<IRepository<Cart>, Repository<Cart>>();
+            builder.Services.AddScoped<IRepository<Promotion>, Repository<Promotion>>();
             builder.Services.AddScoped<IMovieSubImageRepository, MovieSubImageRepository >();
             builder.Services.AddScoped<IActorMovieListRepository, ActorMovieListRepository>();
             builder.Services.AddTransient<IEmailSender, EmailSender>();
@@ -49,8 +53,12 @@ namespace BookingCinema525
 
                 // Path where users are redirected if they lack permissions
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-            }); 
-                        var app = builder.Build();
+            });
+
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
+
+            var app = builder.Build();
             using (var scope = app.Services.CreateScope())
             {
                 var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
