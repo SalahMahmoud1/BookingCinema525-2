@@ -63,7 +63,7 @@ namespace BookingCinema525_new.Areas.Main.Controllers
                     }
                     else
                     {
-                        TempData["Error-Notification"] = "there is no Pormotion to apply this Movie For this user ";
+                        TempData["Error-Notification"] = "there is no Pormotion to apply this Movie For this user";
                     }
                 }
                 else
